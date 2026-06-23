@@ -1,4 +1,5 @@
 import requests, random, binascii, os, uuid, time, re, json
+from typing import Union
 from urllib.parse import urlencode
 from MedoSigner import Argus, Gorgon, md5, Ladon
 
@@ -72,7 +73,7 @@ class TikTok:
         except Exception:
             return []
 
-    def send(self, comment: str, aweme_id: int) -> bool:
+    def send(self, comment: str, aweme_id: str) -> Union[bool, str]:
         url = f"{self.base_url}/lite/v2/comment/publication/"
         params = self.params.copy()
         headers = self.headers.copy()
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     
     print(border)
     for line in info:
-        print("| " + line.ljust(width - 3) + " |") 
+        print("| " + line.ljust(width - 4) + " |")
     print(border)
     
     sessionid = input("\nEnter your TikTok Sessionid : ")
@@ -142,7 +143,7 @@ if __name__ == "__main__":
             com[lang] = comments
             with open("comments.json", "w") as f:
                 json.dump(com, f, indent=4)
-        except:
+        except ValueError:
             print("\nPut Number not shit! ")
             comments = ["محتاجة صديق 😊🍑"]
     print("\n")
@@ -151,14 +152,14 @@ if __name__ == "__main__":
         if videos:
             for vid in videos:
                 comment = random.choice(comments)
-                send = tiktok.send(comment, vid)
-                if send:
-                    print(f"Sent : {comment} to : {vid}")
-                elif not send:                
-                    print(f"Not Sent to : {vid}")
-                else:
+                result = tiktok.send(comment, vid)
+                if result == "Spam":
                     print("Spam Comments ! ")
                     time.sleep(10)
+                elif result:
+                    print(f"Sent : {comment} to : {vid}")
+                else:
+                    print(f"Not Sent to : {vid}")
         else:
             time.sleep(1)
         time.sleep(2)
